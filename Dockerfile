@@ -17,7 +17,7 @@ RUN mkdir -v /usr/src/venv
 COPY --from=builder /usr/src/.venv/ /usr/src/venv/
 
 RUN adduser --uid 1000 musicforprogramming
-
+ADD musicforprogramming.py /usr/src
 WORKDIR /usr/src/
 
 USER musicforprogramming
