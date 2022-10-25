@@ -22,4 +22,4 @@ WORKDIR /usr/src/
 
 USER musicforprogramming
 
-CMD ["./venv/bin/python", "-m", "musicforprogramming.py"]
+CMD ["./venv/bin/python", "musicforprogramming.py"]
