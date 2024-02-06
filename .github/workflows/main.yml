@@ -8,7 +8,7 @@ on:
 jobs:
   venv:
 
-    runs-on: python:3.10-bookworm
+    runs-on: self-hosted
     steps:
     - uses: actions/checkout@v4
     - uses: dorny/paths-filter@v3
@@ -44,7 +44,7 @@ jobs:
 
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: venv
     steps:
       - name: Checkout repository
