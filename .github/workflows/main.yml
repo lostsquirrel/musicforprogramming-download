@@ -11,18 +11,18 @@ jobs:
     runs-on: self-hosted
     steps:
     - uses: actions/checkout@v4
-    - uses: dorny/paths-filter@v3
-      id: changes
+    - name: Restore cached Primes
+      id: cache-restore
+      uses: actions/cache/restore@v4
       with:
-        filters: |
-          pipenv:
-            - 'Pipfile'
+        path: ${{ github.workspace }}/venv
+        key: pipenv-${{ hashFiles(Pipfile.lock) }}
     - uses: actions/setup-python@v5
-      if: steps.changes.outputs.pipenv == 'true'
+      if: steps.cache-restore.outputs.cache-hit != 'true'
       with:
         python-version: '3.10'
 
-    - if: steps.changes.outputs.pipenv == 'true'
+    - if: steps.cache-restore.outputs.cache-hit != 'true'
       name: download dependencies
       run: |
 
@@ -37,10 +37,10 @@ jobs:
 
     - uses: actions/cache/save@v4
       name: cache dependencies
-      if: steps.changes.outputs.pipenv == 'true'
+      if: steps.cache-restore.outputs.cache-hit != 'true'
       with:
         path: ${{ github.workspace }}/venv
-        key: pipenv
+        key: pipenv-${{ hashFiles(Pipfile.lock) }}
 
   build:
 
@@ -68,7 +68,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}/venv
-          key: pipenv
+          key: pipenv-${{ hashFiles(Pipfile.lock) }}
           fail-on-cache-miss: true
       - run: |
           ls -la venv
