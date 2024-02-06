@@ -1,7 +1,8 @@
-import os
-import feedparser
-from pathlib import Path
 import logging
+import os
+from pathlib import Path
+
+import feedparser
 import requests
 
 feed_url = "https://musicforprogramming.net/rss.xml"
@@ -16,7 +17,8 @@ def get_etag():
     p = Path(data_path) / etag_file
     if not p.exists():
         return None
-    return p.read().decode()
+    with p.open("r") as fh:
+        return fh.read().decode()
 
 
 def save_etag(etag: str):
@@ -34,7 +36,7 @@ def get_filename(full_link: str):
 def download():
     d = feedparser.parse(feed_url, get_etag())
     # print(d.keys())
-    # print(d.etag)
+    print(d.etag)
     # feed = d.feed
     # print(type(feed))
     # print(feed.keys())
