@@ -16,7 +16,7 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: ${{ github.workspace }}/venv
-        key: pipenv-${{ hashFiles(Pipfile.lock) }}
+        key: pipenv-${{ hashFiles('Pipfile.lock') }}
     - uses: actions/setup-python@v5
       if: steps.cache-restore.outputs.cache-hit != 'true'
       with:
@@ -40,7 +40,7 @@ jobs:
       if: steps.cache-restore.outputs.cache-hit != 'true'
       with:
         path: ${{ github.workspace }}/venv
-        key: pipenv-${{ hashFiles(Pipfile.lock) }}
+        key: pipenv-${{ hashFiles('Pipfile.lock') }}
 
   build:
 
@@ -68,7 +68,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}/venv
-          key: pipenv-${{ hashFiles(Pipfile.lock) }}
+          key: pipenv-${{ hashFiles('Pipfile.lock') }}
           fail-on-cache-miss: true
       - run: |
           ls -la venv
