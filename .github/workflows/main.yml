@@ -6,78 +6,28 @@ on:
       - 'v*'
 
 jobs:
-  venv:
+  build-and-push-image:
+    runs-on: ubuntu-latest
 
-    runs-on: self-hosted
-    steps:
-    - uses: actions/checkout@v4
-    - name: Restore cached Primes
-      id: cache-restore
-      uses: actions/cache/restore@v4
-      with:
-        path: ${{ github.workspace }}/venv
-        key: pipenv-${{ hashFiles('Pipfile.lock') }}
-    - uses: actions/setup-python@v5
-      if: steps.cache-restore.outputs.cache-hit != 'true'
-      with:
-        python-version: '3.9'
-
-    - if: steps.cache-restore.outputs.cache-hit != 'true'
-      name: download dependencies
-      run: |
-
-        export PIPENV_VENV_IN_PROJECT=1
-
-        pip3 install --upgrade pip
-        pip3 install --user pipenv
-        pipenv sync
-        pipenv --venv
-        mv .venv venv
-        
-
-    - uses: actions/cache/save@v4
-      name: cache dependencies
-      if: steps.cache-restore.outputs.cache-hit != 'true'
-      with:
-        path: ${{ github.workspace }}/venv
-        key: pipenv-${{ hashFiles('Pipfile.lock') }}
-
-  build:
-
-    runs-on: self-hosted
-    needs: venv
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          path: app
+        uses: actions/checkout@v3
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
         with:
           username: ${{ github.actor }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v4
         with:
           images: ${{ github.repository }}
-      - name: Restore cached Primes
-        id: cache-restore
-        uses: actions/cache/restore@v4
-        with:
-          path: ${{ github.workspace }}/venv
-          key: pipenv-${{ hashFiles('Pipfile.lock') }}
-          fail-on-cache-miss: true
-      - run: |
-          ls -la venv
-          mv app/Dockerfile .
+
       - name: Build and push Docker image
-        if: steps.cache-restore.outputs.cache-hit == 'true'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v3
         with:
-          context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
