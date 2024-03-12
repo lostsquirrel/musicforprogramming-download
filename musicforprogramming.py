@@ -18,7 +18,7 @@ def get_etag():
     if not p.exists():
         return None
     with p.open("r") as fh:
-        return fh.read().decode()
+        return fh.read()
 
 
 def save_etag(etag: str):
