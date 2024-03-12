@@ -1,4 +1,4 @@
-FROM docker.io/python:3.10 AS builder
+FROM python:3.11 AS builder
 
 RUN pip install --user pipenv
 
@@ -10,7 +10,7 @@ WORKDIR /usr/src
 
 RUN /root/.local/bin/pipenv sync
 
-FROM docker.io/python:3.10 AS runtime
+FROM python:3.11 AS runtime
 
 RUN mkdir -v /usr/src/venv
 
