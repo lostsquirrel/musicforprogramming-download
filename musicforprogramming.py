@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 def get_etag():
-
     p = Path(data_path) / etag_file
     if not p.exists():
         return None
@@ -22,7 +21,6 @@ def get_etag():
 
 
 def save_etag(etag: str):
-
     p = Path(data_path) / etag_file
     if not p.exists():
         p.touch()
@@ -33,13 +31,16 @@ def get_filename(full_link: str):
     origin_name = full_link.split("music_for_programming_")[1]
     n = origin_name.split("-")
     serial = int(n[0])
-    return '-'.join((f'{serial:03d}',*n[1:]))
+    return "-".join((f"{serial:03d}", *n[1:]))
 
 
 def download():
     d = feedparser.parse(feed_url, get_etag())
     # print(d.keys())
-    print(d.etag)
+    if 'etag' not in d:
+        logger.error("no etag", d)
+        return
+    logger.info(f'latest etag: {d.etag}')
     # feed = d.feed
     # print(type(feed))
     # print(feed.keys())
@@ -54,7 +55,7 @@ def download():
                 else:
                     logger.info(f"start to download {f}")
                     totalbits = 0
-                   
+
                     with f.open("wb") as fh:
                         for chunk in resp.iter_content(chunk_size=1024):
                             if chunk:
@@ -63,13 +64,17 @@ def download():
                     logger.info(f"{f} download finished in {totalbits}")
         else:
             logger.info(f"{f} already exists")
-        
+
     # save_etag(d.etag)
 
 
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-    
-    data_path = os.getenv('DATA_PATH', "/data/music")
+if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
+    data_path = os.getenv("DATA_PATH", "/data/music")
     logger.info(f"start to download to {data_path}")
     download()
