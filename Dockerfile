@@ -22,4 +22,4 @@ WORKDIR /usr/src/
 
 USER musicforprogramming
 
-CMD ["./venv/bin/python", "musicforprogramming.py"]
+CMD umask 022; ./venv/bin/python musicforprogramming.py
